@@ -1,5 +1,5 @@
 #!/bin/bash
-# RestoreFixer 1.0 (4/23/2024) by Gordon Emmerson at Retrospekt
+# RestoreFixer 1.1 (4/23/2024) by Gordon Emmerson at Retrospekt
 
 DevAgent="AMPDevicesAgent"
 
@@ -8,26 +8,20 @@ DiscoAgent="AMPDeviceDiscoveryAgent"
 DiscoAgentPath="/System/Library/PrivateFrameworks/AMPDevices.framework/Versions/A/Support/AMPDeviceDiscoveryAgent"
 
 wait_for_process_to_start() {
-	echo "Waiting for AMPDevicesAgent"
-    while ! pgrep -x "$DevAgent" > /dev/null; do
-        sleep 1
-    done
-    echo "Waiting for AMPDevicesAgent to die"
-    while pgrep -x "$DevAgent" > /dev/null; do
-        sleep 1
-    done
-    echo "AMPDevicesAgent died"
+        echo "Waiting for restore to begin. Connect your device and select "Restore iPod" in the sync window to continue. Do not close this window until the process is complete."
+        while ! pgrep -x "$DevAgent" > /dev/null; do
+                sleep 1
+        done
+        echo "Waiting for restore to finish..."
+        while pgrep -x "$DevAgent" > /dev/null; do
+                sleep 1
+        done
+        echo "Restore complete! Beginning fix..."
+        pkill -9 "$DiscoAgent"
+        echo "Successfully fixed! Waiting for background programs to start..."
+        sleep 5
+        echo "Done! You can now close this window!"
 }
 
-kill_process() {
-    pkill -9 "$DiscoAgent"
-    echo "killed AMPDeviceDiscoveryAgent!"
-}
-# Wait for the process to start
 wait_for_process_to_start
 
-# Kill the other process
-kill_process
-
-# Launch the program
-echo "Done!"
